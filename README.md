@@ -19,13 +19,6 @@ graph TD
     B --> C{Main Application Loop};
     C --> D[Generate Display String from Matrix Data];
     D --> E[Calculate Determinant (Recursive)];
-    subgraph E [Recursive Determinant Calculation]
-        direction LR
-        E1{Base Case? (1x1 or 2x2)} -- Yes --> E2[Calculate Directly];
-        E1 -- No --> E3[Get Cofactor (Submatrix)];
-        E3 --> E4[Recurse on Submatrix];
-        E4 --> E3;
-    end
     E --> F[Render UI with Display String];
     F --> G[Wait for User Input];
     G -- Key Press --> H[Handle Key Press];
