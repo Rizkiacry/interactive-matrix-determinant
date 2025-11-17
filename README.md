@@ -31,33 +31,33 @@ graph TD
 
 ```mermaid
 sequenceDiagram
-    participant User
+    participant Pengguna
     participant main
-    participant Window
+    participant Jendela
     participant getDisplayString
     participant determinantOfMatrix
     participant getCofactor
     participant handleKeyPress
 
-    User->>main: Starts the program
-    main->>Window: new()
-    loop Main Loop
-        main->>getDisplayString: call
-        getDisplayString->>determinantOfMatrix: call
+    Pengguna->>main: Pengguna memulai program.
+    main->>Jendela: Program utama menyiapkan jendela tampilan.
+    loop Loop Utama
+        main->>getDisplayString: Program utama meminta teks untuk ditampilkan.
+        getDisplayString->>determinantOfMatrix: Untuk menampilkan teks, perlu dihitung dulu determinannya.
         activate determinantOfMatrix
-        determinantOfMatrix->>getCofactor: call
-        getCofactor-->>determinantOfMatrix: return cofactor
-        Note right of determinantOfMatrix: Recursive calls omitted for clarity
-        determinantOfMatrix-->>getDisplayString: return determinant
+        determinantOfMatrix->>getCofactor: Perhitungan determinan butuh kofaktor.
+        getCofactor-->>determinantOfMatrix: Kofaktor didapatkan dan dikembalikan.
+        Note right of determinantOfMatrix: Panggilan rekursif dihilangkan untuk kejelasan.
+        determinantOfMatrix-->>getDisplayString: Hasil determinan dikembalikan untuk ditampilkan.
         deactivate determinantOfMatrix
-        getDisplayString-->>main: return display string
-        main->>Window: render()
-        main->>Window: poll_event()
-        Window-->>User: Shows UI
-        User->>Window: Presses a key
-        Window-->>main: returns Event
-        main->>handleKeyPress: call with Event
-        handleKeyPress-->>main: updates state
+        getDisplayString-->>main: Teks final (termasuk determinan) siap ditampilkan.
+        main->>Jendela: Program utama menampilkan semua teks ke jendela.
+        main->>Jendela: Program menunggu input dari pengguna.
+        Jendela-->>Pengguna: Jendela menampilkan antarmuka kepada pengguna.
+        Pengguna->>Jendela: Pengguna menekan sebuah tombol.
+        Jendela-->>main: Informasi tombol yang ditekan dikirim ke program utama.
+        main->>handleKeyPress: Program utama memproses tombol yang ditekan.
+        handleKeyPress-->>main: Status program diperbarui (misal: angka di matriks berubah).
     end
-    main->>Window: close()
+    main->>Jendela: Setelah siklus berhenti (pengguna keluar), program menutup jendela.
 ```
