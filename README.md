@@ -12,7 +12,7 @@ This project is an interactive tool for calculating matrix determinants, utilizi
 *   Lewis Radhi Oktasamiqdad (202531107)
 
 <details>
-<summary>Prerequisites</summary>
+<summary>Prerequisites (Click to expand)</summary>
 
 To build and run this project, you will need:
 
@@ -60,7 +60,7 @@ To build and run this project, you will need:
 </details>
 
 <details>
-<summary>Build Instructions</summary>
+<summary>Build Instructions (Click to expand)</summary>
 
 To build the project, navigate to the project root directory and execute the following commands:
 
