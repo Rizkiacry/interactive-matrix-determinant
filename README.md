@@ -19,7 +19,6 @@ To build and run this project, you will need:
     *   **Windows**: MinGW-w64 (Minimalist GNU for Windows) is recommended.
     *   **macOS/Linux**: GCC or Clang are typically pre-installed or easily installable via package managers.
 *   **CMake**: A cross-platform open-source build system.
-*   **termui-cpp**: The terminal UI library used by this project.
 
 ### Installation
 
