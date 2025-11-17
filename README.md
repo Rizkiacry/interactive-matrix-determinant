@@ -33,7 +33,7 @@ graph TD
 sequenceDiagram
     participant User
     participant main
-    participant tui::Window as Window
+    participant Window
     participant getDisplayString
     participant determinantOfMatrix
     participant getCofactor
