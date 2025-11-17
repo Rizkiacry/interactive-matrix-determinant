@@ -15,16 +15,14 @@ This project is an interactive tool for calculating matrix determinants, utilizi
 
 ```mermaid
 graph TD
-    A[Start] --> B[Initialize TUI Window & Matrix Data];
-    B --> C{Main Application Loop};
-    C --> D[Generate Display String from Matrix Data];
-    D --> E[Calculate Determinant (Recursive)];
-    E --> F[Render UI with Display String];
-    F --> G[Wait for User Input];
-    G -- Key Press --> H[Handle Key Press];
-    H --> I{Update Matrix Data, Size, or Cursor Position};
-    I --> C;
-    G -- 'q' Key --> J[End Loop];
-    J --> K[Close TUI Window];
-    K --> L[End];
+    A[Start] --> B[Init];
+    B --> C{Loop};
+    C --> D[Display];
+    D --> E[Calc_Det];
+    E --> F[Render];
+    F --> G[Input];
+    G --> H[Handle_Key];
+    H --> C;
+    G --> J[Quit];
+    J --> K[End];
 ```
