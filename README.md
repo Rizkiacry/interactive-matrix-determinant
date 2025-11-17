@@ -11,7 +11,8 @@ This project is an interactive tool for calculating matrix determinants, utilizi
 *   FX. Oktabimo DwiPriabudi Sumintro (202531085)
 *   Lewis Radhi Oktasamiqdad (202531107)
 
-## Prerequisites
+<details>
+<summary>Prerequisites</summary>
 
 To build and run this project, you will need:
 
@@ -56,7 +57,10 @@ To build and run this project, you will need:
     # Or equivalent for your distribution
     ```
 
-## Build Instructions
+</details>
+
+<details>
+<summary>Build Instructions</summary>
 
 To build the project, navigate to the project root directory and execute the following commands:
 
@@ -64,6 +68,8 @@ To build the project, navigate to the project root directory and execute the fol
 cmake -B build
 cmake --build build
 ```
+
+</details>
 
 ## Program Flow
 
