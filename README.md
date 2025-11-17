@@ -11,6 +11,61 @@ This project is an interactive tool for calculating matrix determinants, utilizi
 *   FX. Oktabimo DwiPriabudi Sumintro (202531085)
 *   Lewis Radhi Oktasamiqdad (202531107)
 
+## Prerequisites
+
+To build and run this project, you will need:
+
+*   **C++ Compiler**: A C++17 compatible compiler (e.g., GCC, Clang, MSVC).
+    *   **Windows**: MinGW-w64 (Minimalist GNU for Windows) is recommended.
+    *   **macOS/Linux**: GCC or Clang are typically pre-installed or easily installable via package managers.
+*   **CMake**: A cross-platform open-source build system.
+*   **termui-cpp**: The terminal UI library used by this project.
+
+### Installation
+
+**C++ Compiler:**
+
+*   **Windows (MinGW-w64):**
+    ```bash
+    winget install MinGW-w64
+    # Or download from https://mingw-w64.org/doku.php/download
+    ```
+*   **macOS (GCC/Clang):**
+    ```bash
+    xcode-select --install # Installs Xcode Command Line Tools including Clang
+    # Or for GCC: brew install gcc
+    ```
+*   **Linux (GCC/Clang):**
+    ```bash
+    sudo apt update && sudo apt install build-essential # For Debian/Ubuntu
+    # Or equivalent for your distribution
+    ```
+
+**CMake:**
+
+*   **macOS (using Homebrew):**
+    ```bash
+    brew install cmake
+    ```
+*   **Windows (using Winget):**
+    ```bash
+    winget install CMake
+    ```
+*   **Linux:**
+    ```bash
+    sudo apt install cmake # For Debian/Ubuntu
+    # Or equivalent for your distribution
+    ```
+
+## Build Instructions
+
+To build the project, navigate to the project root directory and execute the following commands:
+
+```bash
+cmake -B build
+cmake --build build
+```
+
 ## Program Flow
 
 ```mermaid
