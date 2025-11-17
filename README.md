@@ -11,6 +11,35 @@ This project is an interactive tool for calculating matrix determinants, utilizi
 *   FX. Oktabimo DwiPriabudi Sumintro (202531085)
 *   Lewis Radhi Oktasamiqdad (202531107)
 
+## Prerequisites
+
+To build and run this project, you will need:
+
+*   **CMake**: A cross-platform open-source build system.
+
+### Installation
+
+**macOS (using Homebrew):**
+
+```bash
+brew install cmake
+```
+
+**Windows (using Winget):**
+
+```bash
+winget install CMake
+```
+
+## Build Instructions
+
+To build the project, navigate to the project root directory and execute the following commands:
+
+```bash
+cmake -B build
+cmake --build build
+```
+
 ## Program Flow
 
 ```mermaid
