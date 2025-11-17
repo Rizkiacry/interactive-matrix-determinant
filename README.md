@@ -26,3 +26,38 @@ graph TD
     G --> J[Quit];
     J --> K[End];
 ```
+
+## Sequence Diagram
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant main
+    participant tui::Window as Window
+    participant getDisplayString
+    participant determinantOfMatrix
+    participant getCofactor
+    participant handleKeyPress
+
+    User->>main: Starts the program
+    main->>Window: new()
+    loop Main Loop
+        main->>getDisplayString: call
+        getDisplayString->>determinantOfMatrix: call
+        activate determinantOfMatrix
+        determinantOfMatrix->>getCofactor: call
+        getCofactor-->>determinantOfMatrix: return cofactor
+        Note right of determinantOfMatrix: Recursive calls omitted for clarity
+        determinantOfMatrix-->>getDisplayString: return determinant
+        deactivate determinantOfMatrix
+        getDisplayString-->>main: return display string
+        main->>Window: render()
+        main->>Window: poll_event()
+        Window-->>User: Shows UI
+        User->>Window: Presses a key
+        Window-->>main: returns Event
+        main->>handleKeyPress: call with Event
+        handleKeyPress-->>main: updates state
+    end
+    main->>Window: close()
+```
