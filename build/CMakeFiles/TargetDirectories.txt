@@ -1,3 +1,0 @@
-/Users/rizkia/test0002/build/CMakeFiles/0001.dir
-/Users/rizkia/test0002/build/CMakeFiles/edit_cache.dir
-/Users/rizkia/test0002/build/CMakeFiles/rebuild_cache.dir
