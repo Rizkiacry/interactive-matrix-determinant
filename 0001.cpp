@@ -1,24 +1,22 @@
 #include "tui.hpp"
-#include <algorithm> // For std::min and std::max
-#include <cstring>   // For memset
-#include <stdexcept> // For std::out_of_range
+#include <algorithm>
+#include <cstring>
 #include <string>
 
 using namespace std;
 
-// Define a constant for the maximum size of the matrix.
 #define MAX_N 10
 
-// Forward declarations for functions used in main loop
-string getDisplayString(int n, int mat[MAX_N][MAX_N], int current_row,
+double mat[MAX_N][MAX_N];
+double current_determinant = 0.0; // Global determinant
+
+string getDisplayString(int n, double mat[MAX_N][MAX_N], int current_row,
                         int current_col, const string &current_input_str);
 void handleKeyPress(tui::Event event, bool &running, int &n,
-                    int mat[MAX_N][MAX_N], int &current_row, int &current_col,
+                    double mat[MAX_N][MAX_N], int &current_row, int &current_col,
                     string &current_input_str);
 
-// This function calculates the submatrix (cofactor) needed for the determinant
-// calculation.
-void getCofactor(int mat[MAX_N][MAX_N], int temp[MAX_N][MAX_N], int p, int q,
+void getCofactor(double mat[MAX_N][MAX_N], double temp[MAX_N][MAX_N], int p, int q,
                  int n) {
   int temp_i = 0;
   for (int i = 0; i < n; i++) {
@@ -35,23 +33,22 @@ void getCofactor(int mat[MAX_N][MAX_N], int temp[MAX_N][MAX_N], int p, int q,
   }
 }
 
-// This function calculates the determinant of a square matrix using Laplace's
-// expansion.
-int determinantOfMatrix(int matrix[MAX_N][MAX_N], int n) {
-  // Base case 1: If matrix is 1x1, determinant is the single element.
+double determinantOfMatrix(double matrix[MAX_N][MAX_N], int n) {
   if (n == 1)
     return matrix[0][0];
-  // Base case 2: For a 2x2 matrix, the formula is simple and ends the
-  // recursion.
   if (n == 2)
     return (matrix[0][0] * matrix[1][1]) - (matrix[0][1] * matrix[1][0]);
 
-  int D = 0;
-  int temp[MAX_N][MAX_N];
+  double D = 0;
+  double temp[MAX_N][MAX_N];
   int sign = 1;
 
   for (int f = 0; f < n; f++) {
-    memset(temp, 0, sizeof(temp));
+    for(int i = 0; i < MAX_N; ++i) {
+        for(int j = 0; j < MAX_N; ++j) {
+            temp[i][j] = 0.0;
+        }
+    }
     getCofactor(matrix, temp, 0, f, n);
     D += sign * matrix[0][f] * determinantOfMatrix(temp, n - 1);
     sign = -sign;
@@ -60,11 +57,9 @@ int determinantOfMatrix(int matrix[MAX_N][MAX_N], int n) {
   return D;
 }
 
-// The main function where the program starts.
 int main() {
   tui::Window window;
   int n = 3;
-  int mat[MAX_N][MAX_N];
   memset(mat, 0, sizeof(mat));
 
   int current_row = 0;
@@ -75,11 +70,9 @@ int main() {
   while (running) {
     window.clear();
 
-    // 1. Build the display string
     string display_str =
         getDisplayString(n, mat, current_row, current_col, current_input_str);
 
-    // 2. Setup and render the TUI widget
     tui::Paragraph p;
     p.set_dimensions(0, 0, 60, 25);
     p.title = "Matrix Determinant Calculator";
@@ -87,7 +80,6 @@ int main() {
     window.add(p);
     window.render();
 
-    // 3. Handle user input
     tui::Event event;
     if (window.poll_event(event)) {
       handleKeyPress(event, running, n, mat, current_row, current_col,
@@ -99,88 +91,80 @@ int main() {
   return 0;
 }
 
-// This function builds the string that gets displayed in the TUI.
-// It's separated from the main loop to make the main loop easier to read.
-string getDisplayString(int n, int mat[MAX_N][MAX_N], int current_row,
+string getDisplayString(int n, double mat[MAX_N][MAX_N], int current_row,
                         int current_col, const string &current_input_str) {
   string display_str =
       "Matrix (Size: " + to_string(n) + "x" + to_string(n) + ")\n";
   for (int i = 0; i < n; ++i) {
     for (int j = 0; j < n; ++j) {
+      string value_to_display;
       if (i == current_row && j == current_col) {
-        display_str += "[" +
-                       (current_input_str.empty() ? to_string(mat[i][j])
-                                                  : current_input_str) +
-                       "] ";
+        value_to_display = current_input_str.empty() ? to_string(mat[i][j]) : current_input_str;
+        display_str += "[" + value_to_display + "] ";
       } else {
-        display_str += " " + to_string(mat[i][j]) + "  ";
+        value_to_display = to_string(mat[i][j]);
+        display_str += value_to_display + " ";
       }
     }
     display_str += "\n";
   }
 
-  int det = determinantOfMatrix(mat, n);
-  display_str += "\nDeterminant: " + to_string(det);
-  display_str += "\n\nUse arrow keys to navigate.";
+  display_str += "\nDeterminant: " + to_string(current_determinant);
+  display_str += "\n\nUse arrow keys, hjkl, or wasd to navigate.";
+  display_str += "\nUse Enter to confirm input.";
   display_str += "\nPress '.' to increase matrix size, ',' to decrease.";
   display_str += "\nPress 'q' to quit.";
 
   return display_str;
 }
 
-// This function handles all the key presses from the user.
-// It's separated from the main loop to make the main loop easier to read.
 void handleKeyPress(tui::Event event, bool &running, int &n,
-                    int mat[MAX_N][MAX_N], int &current_row, int &current_col,
+                    double mat[MAX_N][MAX_N], int &current_row, int &current_col,
                     string &current_input_str) {
   if (event.type != tui::KEYDOWN)
     return;
 
-  // Handle quitting
   if (event.key == 'q') {
     running = false;
     return;
   }
 
-  // Handle matrix resizing
   if (event.key == '.' || event.key == ',') {
     if (event.key == '.')
       n = std::min(n + 1, MAX_N);
     if (event.key == ',')
       n = std::max(n - 1, 1);
-    // When passing a C-style array to a function, it decays to a pointer.
-    // This means sizeof(mat) would give the size of a pointer, not the full
-    // array. We must use the full, explicit size to clear the whole array.
-    memset(mat, 0, MAX_N * MAX_N * sizeof(int));
+    memset(mat, 0, MAX_N * MAX_N * sizeof(double));
     current_row = 0;
     current_col = 0;
     current_input_str = "";
+    current_determinant = determinantOfMatrix(mat, n);
     return;
   }
 
-  // Handle navigation
-  if (event.key == KEY_UP)
-    current_row = std::max(0, current_row - 1);
-  if (event.key == KEY_DOWN)
-    current_row = std::min(n - 1, current_row + 1);
-  if (event.key == KEY_LEFT)
-    current_col = std::max(0, current_col - 1);
-  if (event.key == KEY_RIGHT)
-    current_col = std::min(n - 1, current_col + 1);
-  // After any navigation, clear the input string
-  if (event.key == KEY_UP || event.key == KEY_DOWN || event.key == KEY_LEFT ||
-      event.key == KEY_RIGHT) {
-    current_input_str = "";
-    return;
-  }
+    if (event.key == KEY_UP || event.key == 'k' || event.key == 'w') {
+      current_row = max(0, current_row - 1);
+    }
+    if (event.key == KEY_DOWN || event.key == 'j' || event.key == 's') {
+      current_row = min(n - 1, current_row + 1);
+    }
+    if (event.key == KEY_LEFT || event.key == 'h' || event.key == 'a') {
+      current_col = max(0, current_col - 1);
+    }
+    if (event.key == KEY_RIGHT || event.key == 'l' || event.key == 'd') {
+      current_col = min(n - 1, current_col + 1);
+    }
+    if (event.key == KEY_UP || event.key == KEY_DOWN || event.key == KEY_LEFT ||
+        event.key == KEY_RIGHT || event.key == 'h' || event.key == 'j' ||
+        event.key == 'k' || event.key == 'l' || event.key == 'w' ||
+        event.key == 'a' || event.key == 's' || event.key == 'd') {
+      current_input_str = "";
+    }
 
-  // Handle number input
-  if (event.key >= '0' && event.key <= '9') {
+  if ((event.key >= '0' && event.key <= '9') || event.key == '-' || event.key == '.') {
     current_input_str += (char)event.key;
-    return;
   }
 
-  // Handle backspace
   if (event.key == KEY_BACKSPACE || event.key == 127) {
     if (!current_input_str.empty()) {
       current_input_str.pop_back();
@@ -188,14 +172,10 @@ void handleKeyPress(tui::Event event, bool &running, int &n,
     return;
   }
 
-  // Handle enter
   if (event.key == KEY_ENTER || event.key == '\n') {
     if (!current_input_str.empty()) {
-      try {
-        mat[current_row][current_col] = stoi(current_input_str);
-      } catch (const std::out_of_range &oor) {
-        mat[current_row][current_col] = 0; // Default to 0 if input is too large
-      }
+      mat[current_row][current_col] = stod(current_input_str);
+      current_determinant = determinantOfMatrix(mat, n);
       current_input_str = "";
     }
     return;

@@ -69,6 +69,12 @@ cmake -B build
 cmake --build build
 ```
 
+To run the executable:
+
+```bash
+./build/0001
+```
+
 </details>
 
 ## Program Flow
