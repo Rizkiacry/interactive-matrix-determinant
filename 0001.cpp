@@ -57,14 +57,15 @@ int determinantOfMatrix(int matrix[MAX_N][MAX_N], int n) {
         temp, 0,
         sizeof(temp));                  // clear cofactor with 0
     getCofactor(matrix, temp, 0, f, n); // use cofactor blueprint
-    D += sign * matrix[0][f] * determinantOfMatrix(temp, n - 1); //
-    sign = -sign;
+    D += sign * matrix[0][f] *
+         determinantOfMatrix(temp, n - 1); // rumus kofaktor
+    sign = -sign;                          // after loop done, flip sign
   }
 
   return D;
 }
 
-int main() {
+int main() { // main interface default 3x3
   tui::Window window;
   int n = 3;
   memset(mat, 0, sizeof(mat));
@@ -80,14 +81,14 @@ int main() {
     string display_str =
         getDisplayString(n, mat, current_row, current_col, current_input_str);
 
-    tui::Paragraph p;
+    tui::Paragraph p; // use widget from hpp
     p.set_dimensions(0, 0, 60, 25);
     p.title = "Matrix Determinant Calculator";
     p.text = display_str;
     window.add(p);
     window.render();
 
-    tui::Event event;
+    tui::Event event; // respond to user input from hpp
     if (window.poll_event(event)) {
       handleKeyPress(event, running, n, mat, current_row, current_col,
                      current_input_str);
@@ -98,8 +99,11 @@ int main() {
   return 0;
 }
 
-string getDisplayString(int n, int mat[MAX_N][MAX_N], int current_row,
-                        int current_col, const string &current_input_str) {
+// description
+string getDisplayString(
+    int n, int mat[MAX_N][MAX_N], int current_row, int current_col,
+    const string &current_input_str) { // THIS IS A DUPLICATE, DO NOT DELETE
+                                       // OTHERWISE IT BROKE
   string display_str =
       "Matrix (Size: " + to_string(n) + "x" + to_string(n) + ")\n";
   for (int i = 0; i < n; ++i) {
@@ -126,9 +130,11 @@ string getDisplayString(int n, int mat[MAX_N][MAX_N], int current_row,
   return display_str;
 }
 
+// keys
 void handleKeyPress(tui::Event event, bool &running, int &n,
                     int mat[MAX_N][MAX_N], int &current_row, int &current_col,
-                    string &current_input_str) {
+                    string &current_input_str) { // THIS IS A DUPLICATE, DO NOT
+                                                 // DELETE OTHERWISE IT BROKE
   if (event.type != tui::KEYDOWN)
     return;
 
@@ -137,7 +143,7 @@ void handleKeyPress(tui::Event event, bool &running, int &n,
     return;
   }
 
-  if (event.key == '.' || event.key == ',') {
+  if (event.key == '.' || event.key == ',') { // increase matrix size
     if (event.key == '.')
       n = std::min(n + 1, MAX_N);
     if (event.key == ',')
