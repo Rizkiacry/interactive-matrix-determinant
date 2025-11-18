@@ -1,0 +1,200 @@
+// Include necessary libraries
+INCLUDE "tui.hpp"
+INCLUDE <algorithm>
+INCLUDE <cstring>
+INCLUDE <string>
+
+// Use standard namespace
+USE NAMESPACE std
+
+// Define maximum matrix size
+DEFINE MAX_N 10
+
+// Declare global matrix
+DECLARE INTEGER 2D_ARRAY mat[MAX_N][MAX_N]
+
+// Declare global variable to store determinant
+DECLARE INTEGER current_determinant = 0
+
+// Forward declaration for function to get display string
+FUNCTION getDisplayString(n: INTEGER, mat: INTEGER 2D_ARRAY, current_row: INTEGER, current_col: INTEGER, current_input_str: STRING) RETURNS STRING
+
+// Forward declaration for function to handle key presses
+FUNCTION handleKeyPress(event: tui.Event, running: BOOLEAN_REFERENCE, n: INTEGER_REFERENCE, mat: INTEGER 2D_ARRAY, current_row: INTEGER_REFERENCE, current_col: INTEGER_REFERENCE, current_input_str: STRING_REFERENCE)
+
+// Function to get cofactor of a matrix
+FUNCTION getCofactor(mat: INTEGER 2D_ARRAY, temp: INTEGER 2D_ARRAY, p: INTEGER, q: INTEGER, n: INTEGER)
+  DECLARE INTEGER temp_i = 0
+  FOR i FROM 0 TO n-1
+    IF i IS EQUAL TO p THEN
+      CONTINUE LOOP
+    END IF
+    DECLARE INTEGER temp_j = 0
+    FOR j FROM 0 TO n-1
+      IF j IS EQUAL TO q THEN
+        CONTINUE LOOP
+      END IF
+      SET temp[temp_i][temp_j] = mat[i][j]
+      INCREMENT temp_j
+    END FOR
+    INCREMENT temp_i
+  END FOR
+END FUNCTION
+
+// Function to calculate determinant of a matrix
+FUNCTION determinantOfMatrix(matrix: INTEGER 2D_ARRAY, n: INTEGER) RETURNS INTEGER
+  IF n IS EQUAL TO 1 THEN
+    RETURN matrix[0][0]
+  END IF
+  IF n IS EQUAL TO 2 THEN
+    RETURN (matrix[0][0] * matrix[1][1]) - (matrix[0][1] * matrix[1][0])
+  END IF
+
+  DECLARE INTEGER D = 0
+  DECLARE INTEGER 2D_ARRAY temp[MAX_N][MAX_N]
+  DECLARE INTEGER sign = 1
+
+  FOR f FROM 0 TO n-1
+    // Initialize temp array with zeros
+    SET MEMORY of temp TO 0 FOR SIZE of temp
+    CALL getCofactor(matrix, temp, 0, f, n)
+    SET D = D + (sign * matrix[0][f] * CALL determinantOfMatrix(temp, n - 1))
+    SET sign = -sign
+  END FOR
+
+  RETURN D
+END FUNCTION
+
+// Main function
+FUNCTION main() RETURNS INTEGER
+  DECLARE tui.Window window
+  DECLARE INTEGER n = 3
+  // Initialize global mat array with zeros
+  SET MEMORY of mat TO 0 FOR SIZE of mat
+
+  DECLARE INTEGER current_row = 0
+  DECLARE INTEGER current_col = 0
+  DECLARE STRING current_input_str = ""
+  DECLARE BOOLEAN running = TRUE
+
+  WHILE running IS TRUE
+    CALL window.clear()
+
+    // Get the string to display in the TUI
+    DECLARE STRING display_str = CALL getDisplayString(n, mat, current_row, current_col, current_input_str)
+
+    // Setup and render the TUI paragraph widget
+    DECLARE tui.Paragraph p
+    CALL p.set_dimensions(0, 0, 60, 25)
+    SET p.title = "Matrix Determinant Calculator"
+    SET p.text = display_str
+    CALL window.add(p)
+    CALL window.render()
+
+    // Handle user input event
+    DECLARE tui.Event event
+    IF CALL window.poll_event(event) IS TRUE THEN
+      CALL handleKeyPress(event, running, n, mat, current_row, current_col, current_input_str)
+    END IF
+  END WHILE
+
+  CALL window.close()
+  RETURN 0
+END FUNCTION
+
+// Function to build the string that gets displayed in the TUI
+FUNCTION getDisplayString(n: INTEGER, mat: INTEGER 2D_ARRAY, current_row: INTEGER, current_col: INTEGER, current_input_str: STRING) RETURNS STRING
+  DECLARE STRING display_str = "Matrix (Size: " + CONVERT n TO STRING + "x" + CONVERT n TO STRING + ")\n"
+  FOR i FROM 0 TO n-1
+    FOR j FROM 0 TO n-1
+      DECLARE STRING value_to_display
+      IF i IS EQUAL TO current_row AND j IS EQUAL TO current_col THEN
+        IF current_input_str IS EMPTY THEN
+          SET value_to_display = CONVERT mat[i][j] TO STRING
+        ELSE
+          SET value_to_display = current_input_str
+        END IF
+        SET display_str = display_str + "[" + value_to_display + "] "
+      ELSE
+        SET value_to_display = CONVERT mat[i][j] TO STRING
+        SET display_str = display_str + value_to_display + " "
+      END IF
+    END FOR
+    SET display_str = display_str + "\n"
+  END FOR
+
+  SET display_str = display_str + "\nDeterminant: " + CONVERT current_determinant TO STRING
+  SET display_str = display_str + "\n\nUse arrow keys, hjkl, or wasd to navigate."
+  SET display_str = display_str + "\nUse Enter to confirm input."
+  SET display_str = display_str + "\nPress '.' to increase matrix size, ',' to decrease."
+  SET display_str = display_str + "\nPress 'q' to quit."
+
+  RETURN display_str
+END FUNCTION
+
+// Function to handle all key presses from the user
+FUNCTION handleKeyPress(event: tui.Event, running: BOOLEAN_REFERENCE, n: INTEGER_REFERENCE, mat: INTEGER 2D_ARRAY, current_row: INTEGER_REFERENCE, current_col: INTEGER_REFERENCE, current_input_str: STRING_REFERENCE)
+  IF event.type IS NOT EQUAL TO tui.KEYDOWN THEN
+    RETURN
+  END IF
+
+  IF event.key IS EQUAL TO 'q' THEN
+    SET running = FALSE
+    RETURN
+  END IF
+
+  IF event.key IS EQUAL TO '.' OR event.key IS EQUAL TO ',' THEN
+    IF event.key IS EQUAL TO '.' THEN
+      SET n = MINIMUM OF (n + 1, MAX_N)
+    END IF
+    IF event.key IS EQUAL TO ',' THEN
+      SET n = MAXIMUM OF (n - 1, 1)
+    END IF
+    // Initialize mat array with zeros
+    SET MEMORY of mat TO 0 FOR SIZE of mat
+    SET current_row = 0
+    SET current_col = 0
+    SET current_input_str = ""
+    SET current_determinant = CALL determinantOfMatrix(mat, n)
+    RETURN
+  END IF
+
+  IF event.key IS EQUAL TO KEY_UP OR event.key IS EQUAL TO 'k' OR event.key IS EQUAL TO 'w' THEN
+    SET current_row = MAXIMUM OF (0, current_row - 1)
+  END IF
+  IF event.key IS EQUAL TO KEY_DOWN OR event.key IS EQUAL TO 'j' OR event.key IS EQUAL TO 's' THEN
+    SET current_row = MINIMUM OF (n - 1, current_row + 1)
+  END IF
+  IF event.key IS EQUAL TO KEY_LEFT OR event.key IS EQUAL TO 'h' OR event.key IS EQUAL TO 'a' THEN
+    SET current_col = MAXIMUM OF (0, current_col - 1)
+  END IF
+  IF event.key IS EQUAL TO KEY_RIGHT OR event.key IS EQUAL TO 'l' OR event.key IS EQUAL TO 'd' THEN
+    SET current_col = MINIMUM OF (n - 1, current_col + 1)
+  END IF
+  IF event.key IS EQUAL TO KEY_UP OR event.key IS EQUAL TO KEY_DOWN OR event.key IS EQUAL TO KEY_LEFT OR
+     event.key IS EQUAL TO KEY_RIGHT OR event.key IS EQUAL TO 'h' OR event.key IS EQUAL TO 'j' OR
+     event.key IS EQUAL TO 'k' OR event.key IS EQUAL TO 'l' OR event.key IS EQUAL TO 'w' OR
+     event.key IS EQUAL TO 'a' OR event.key IS EQUAL TO 's' OR event.key IS EQUAL TO 'd' THEN
+    SET current_input_str = ""
+  END IF
+
+  IF (event.key IS GREATER THAN OR EQUAL TO '0' AND event.key IS LESS THAN OR EQUAL TO '9') OR event.key IS EQUAL TO '-' THEN
+    SET current_input_str = current_input_str + CONVERT event.key TO CHARACTER
+  END IF
+
+  IF event.key IS EQUAL TO KEY_BACKSPACE OR event.key IS EQUAL TO 127 THEN
+    IF current_input_str IS NOT EMPTY THEN
+      REMOVE LAST CHARACTER FROM current_input_str
+    END IF
+    RETURN
+  END IF
+
+  IF event.key IS EQUAL TO KEY_ENTER OR event.key IS EQUAL TO '\n' THEN
+    IF current_input_str IS NOT EMPTY THEN
+      SET mat[current_row][current_col] = CONVERT current_input_str TO INTEGER
+      SET current_determinant = CALL determinantOfMatrix(mat, n)
+      SET current_input_str = ""
+    END IF
+    RETURN
+  END IF
+END FUNCTION
