@@ -127,3 +127,7 @@ sequenceDiagram
     end
     main->>Jendela: Setelah siklus berhenti (pengguna keluar), program menutup jendela.
 ```
+
+## Screenshot
+
+![Screenshot](screenshot.png)
