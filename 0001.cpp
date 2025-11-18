@@ -7,16 +7,16 @@ using namespace std;
 
 #define MAX_N 10
 
-double mat[MAX_N][MAX_N];
-double current_determinant = 0.0; // Global determinant
+int mat[MAX_N][MAX_N];
+int current_determinant = 0; // Global determinant
 
-string getDisplayString(int n, double mat[MAX_N][MAX_N], int current_row,
+string getDisplayString(int n, int mat[MAX_N][MAX_N], int current_row,
                         int current_col, const string &current_input_str);
 void handleKeyPress(tui::Event event, bool &running, int &n,
-                    double mat[MAX_N][MAX_N], int &current_row, int &current_col,
+                    int mat[MAX_N][MAX_N], int &current_row, int &current_col,
                     string &current_input_str);
 
-void getCofactor(double mat[MAX_N][MAX_N], double temp[MAX_N][MAX_N], int p, int q,
+void getCofactor(int mat[MAX_N][MAX_N], int temp[MAX_N][MAX_N], int p, int q,
                  int n) {
   int temp_i = 0;
   for (int i = 0; i < n; i++) {
@@ -33,22 +33,18 @@ void getCofactor(double mat[MAX_N][MAX_N], double temp[MAX_N][MAX_N], int p, int
   }
 }
 
-double determinantOfMatrix(double matrix[MAX_N][MAX_N], int n) {
+int determinantOfMatrix(int matrix[MAX_N][MAX_N], int n) {
   if (n == 1)
     return matrix[0][0];
   if (n == 2)
     return (matrix[0][0] * matrix[1][1]) - (matrix[0][1] * matrix[1][0]);
 
-  double D = 0;
-  double temp[MAX_N][MAX_N];
+  int D = 0;
+  int temp[MAX_N][MAX_N];
   int sign = 1;
 
   for (int f = 0; f < n; f++) {
-    for(int i = 0; i < MAX_N; ++i) {
-        for(int j = 0; j < MAX_N; ++j) {
-            temp[i][j] = 0.0;
-        }
-    }
+    memset(temp, 0, sizeof(temp)); // Use memset for int array
     getCofactor(matrix, temp, 0, f, n);
     D += sign * matrix[0][f] * determinantOfMatrix(temp, n - 1);
     sign = -sign;
@@ -91,7 +87,7 @@ int main() {
   return 0;
 }
 
-string getDisplayString(int n, double mat[MAX_N][MAX_N], int current_row,
+string getDisplayString(int n, int mat[MAX_N][MAX_N], int current_row,
                         int current_col, const string &current_input_str) {
   string display_str =
       "Matrix (Size: " + to_string(n) + "x" + to_string(n) + ")\n";
@@ -119,7 +115,7 @@ string getDisplayString(int n, double mat[MAX_N][MAX_N], int current_row,
 }
 
 void handleKeyPress(tui::Event event, bool &running, int &n,
-                    double mat[MAX_N][MAX_N], int &current_row, int &current_col,
+                    int mat[MAX_N][MAX_N], int &current_row, int &current_col,
                     string &current_input_str) {
   if (event.type != tui::KEYDOWN)
     return;
@@ -134,7 +130,7 @@ void handleKeyPress(tui::Event event, bool &running, int &n,
       n = std::min(n + 1, MAX_N);
     if (event.key == ',')
       n = std::max(n - 1, 1);
-    memset(mat, 0, MAX_N * MAX_N * sizeof(double));
+    memset(mat, 0, MAX_N * MAX_N * sizeof(int));
     current_row = 0;
     current_col = 0;
     current_input_str = "";
@@ -161,7 +157,7 @@ void handleKeyPress(tui::Event event, bool &running, int &n,
       current_input_str = "";
     }
 
-  if ((event.key >= '0' && event.key <= '9') || event.key == '-' || event.key == '.') {
+  if ((event.key >= '0' && event.key <= '9') || event.key == '-') {
     current_input_str += (char)event.key;
   }
 
@@ -174,7 +170,7 @@ void handleKeyPress(tui::Event event, bool &running, int &n,
 
   if (event.key == KEY_ENTER || event.key == '\n') {
     if (!current_input_str.empty()) {
-      mat[current_row][current_col] = stod(current_input_str);
+      mat[current_row][current_col] = stoi(current_input_str);
       current_determinant = determinantOfMatrix(mat, n);
       current_input_str = "";
     }
