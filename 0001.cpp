@@ -1,3 +1,6 @@
+// BACA PSEUDOCODE AKU SUSAH JELASINNYA
+// I'LL HELP WHAT I CAN USING COMMENTS
+
 #include "tui.hpp"
 #include <algorithm>
 #include <cstring>
@@ -7,46 +10,54 @@ using namespace std;
 
 #define MAX_N 10
 
-int mat[MAX_N][MAX_N];
-int current_determinant = 0; // Global determinant
+int mat[MAX_N][MAX_N];       // original grid
+int current_determinant = 0; // global determinant
 
+// blueprint for building the text to show on the screen
 string getDisplayString(int n, int mat[MAX_N][MAX_N], int current_row,
                         int current_col, const string &current_input_str);
+
+// blueprint for reacting to what the user types
 void handleKeyPress(tui::Event event, bool &running, int &n,
                     int mat[MAX_N][MAX_N], int &current_row, int &current_col,
                     string &current_input_str);
 
+// blueprint for cofactor (smaller grid)
 void getCofactor(int mat[MAX_N][MAX_N], int temp[MAX_N][MAX_N], int p, int q,
                  int n) {
   int temp_i = 0;
-  for (int i = 0; i < n; i++) {
+  for (int i = 0; i < n; i++) { // if row is the skip row, skip
     if (i == p)
       continue;
     int temp_j = 0;
     for (int j = 0; j < n; j++) {
       if (j == q)
         continue;
-      temp[temp_i][temp_j] = mat[i][j];
+      temp[temp_i][temp_j] = mat[i][j]; // copy value, then next
       temp_j++;
     }
     temp_i++;
   }
 }
 
+// blueprint for determinant
 int determinantOfMatrix(int matrix[MAX_N][MAX_N], int n) {
   if (n == 1)
-    return matrix[0][0];
+    return matrix[0][0]; // 1x1 matrix
   if (n == 2)
-    return (matrix[0][0] * matrix[1][1]) - (matrix[0][1] * matrix[1][0]);
+    return (matrix[0][0] * matrix[1][1]) -
+           (matrix[0][1] * matrix[1][0]); // 2x2 matrix
 
   int D = 0;
   int temp[MAX_N][MAX_N];
   int sign = 1;
 
   for (int f = 0; f < n; f++) {
-    memset(temp, 0, sizeof(temp)); // Use memset for int array
-    getCofactor(matrix, temp, 0, f, n);
-    D += sign * matrix[0][f] * determinantOfMatrix(temp, n - 1);
+    memset( // integer needs memset for array calc otherwise it broke idk
+        temp, 0,
+        sizeof(temp));                  // clear cofactor with 0
+    getCofactor(matrix, temp, 0, f, n); // use cofactor blueprint
+    D += sign * matrix[0][f] * determinantOfMatrix(temp, n - 1); //
     sign = -sign;
   }
 
@@ -95,7 +106,8 @@ string getDisplayString(int n, int mat[MAX_N][MAX_N], int current_row,
     for (int j = 0; j < n; ++j) {
       string value_to_display;
       if (i == current_row && j == current_col) {
-        value_to_display = current_input_str.empty() ? to_string(mat[i][j]) : current_input_str;
+        value_to_display = current_input_str.empty() ? to_string(mat[i][j])
+                                                     : current_input_str;
         display_str += "[" + value_to_display + "] ";
       } else {
         value_to_display = to_string(mat[i][j]);
@@ -138,24 +150,24 @@ void handleKeyPress(tui::Event event, bool &running, int &n,
     return;
   }
 
-    if (event.key == KEY_UP || event.key == 'k' || event.key == 'w') {
-      current_row = max(0, current_row - 1);
-    }
-    if (event.key == KEY_DOWN || event.key == 'j' || event.key == 's') {
-      current_row = min(n - 1, current_row + 1);
-    }
-    if (event.key == KEY_LEFT || event.key == 'h' || event.key == 'a') {
-      current_col = max(0, current_col - 1);
-    }
-    if (event.key == KEY_RIGHT || event.key == 'l' || event.key == 'd') {
-      current_col = min(n - 1, current_col + 1);
-    }
-    if (event.key == KEY_UP || event.key == KEY_DOWN || event.key == KEY_LEFT ||
-        event.key == KEY_RIGHT || event.key == 'h' || event.key == 'j' ||
-        event.key == 'k' || event.key == 'l' || event.key == 'w' ||
-        event.key == 'a' || event.key == 's' || event.key == 'd') {
-      current_input_str = "";
-    }
+  if (event.key == KEY_UP || event.key == 'k' || event.key == 'w') {
+    current_row = max(0, current_row - 1);
+  }
+  if (event.key == KEY_DOWN || event.key == 'j' || event.key == 's') {
+    current_row = min(n - 1, current_row + 1);
+  }
+  if (event.key == KEY_LEFT || event.key == 'h' || event.key == 'a') {
+    current_col = max(0, current_col - 1);
+  }
+  if (event.key == KEY_RIGHT || event.key == 'l' || event.key == 'd') {
+    current_col = min(n - 1, current_col + 1);
+  }
+  if (event.key == KEY_UP || event.key == KEY_DOWN || event.key == KEY_LEFT ||
+      event.key == KEY_RIGHT || event.key == 'h' || event.key == 'j' ||
+      event.key == 'k' || event.key == 'l' || event.key == 'w' ||
+      event.key == 'a' || event.key == 's' || event.key == 'd') {
+    current_input_str = "";
+  }
 
   if ((event.key >= '0' && event.key <= '9') || event.key == '-') {
     current_input_str += (char)event.key;
